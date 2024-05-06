@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daftar Manuskrip</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Daftar Manuskrip</h1>
+    <table id="manuskripTable" border="1">
+        <tr>
+            <th>Judul Manuskrip</th>
+            <th>Penulis</th>
+            <th>Editor</th>
+            <th>Status</th>
+            <th>Tanggal Masuk</th>
+            <th>Tanggal Revisi Terakhir</th>
+            <th>Opsi</th>
+        </tr>
+    </table>
+
+    <script>
+        $(document).ready(function () {
+            // Mengambil data JSON dari PHP
+            $.ajax({
+                url: 'ambil_data.php', // Endpoint PHP dari langkah 1
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var table = $('#manuskripTable');
+                    // Menambahkan data ke dalam tabel
+                    data.forEach(function (manuskrip) {
+                        var row = $('<tr>');
+                        row.append('<td>' + manuskrip.judul_manuskrip + '</td>');
+                        row.append('<td>' + manuskrip.penulis + '</td>');
+                        row.append('<td>' + manuskrip.editor + '</td>');
+                        row.append('<td>' + manuskrip.status + '</td>');
+                        row.append('<td>' + manuskrip.tanggal_masuk + '</td>');
+                        row.append('<td>' + manuskrip.tanggal_revisi_terakhir + '</td>');
+                        row.append('<td><button class="deleteButton" data-judul="' + manuskrip.judul_manuskrip + '">Hapus</button></td>');
+                        table.append(row);
+                    });
+                },
+                error: function () {
+                    console.error('Gagal mengambil data dari server.');
+                }
+            });
+
+            // Menangani klik tombol hapus
+            $('#manuskripTable').on('click', '.deleteButton', function () {
+                var judul = $(this).data('judul');
+                if (confirm("Apakah Anda yakin ingin menghapus manuskrip ini?")) {
+                    $.ajax({
+                        url: 'hapus_data.php', // Endpoint untuk menghapus data
+                        type: 'GET',
+                        data: {
+                            judul: judul
+                        },
+                        success: function () {
+                            alert('Data berhasil dihapus.');
+                            location.reload(); // Refresh halaman untuk memperbarui tabel
+                        },
+                        error: function () {
+                            console.error('Gagal menghapus data.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
